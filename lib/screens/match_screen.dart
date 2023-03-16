@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/providers.dart';
@@ -10,54 +11,20 @@ class MatchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final apiProvider = Provider.of<ApiProvider>(context);
+
+    final apiProvider = Provider.of<ApiProvider>(context, listen: false);
+    final teamProvider = Provider.of<TeamProvider>(context);
     final width = MediaQuery.of(context).size.width;
 
-    String day = '';
-    String hour = '';
-    int homeTeam = 1;
-    int awayTeam = 1;
-    String homeName = '';
-    String awayName = '';
-    int homeScore = 0;
-    int awayScore = 0;
-    int id = 0;
-
-    switch (apiProvider.matchType){
-      case 0: // last match
-       day = apiProvider.lastMatchDay;
-       hour = apiProvider.lastMatchHour;
-       homeTeam = apiProvider.lastTeamIdHome;
-       awayTeam = apiProvider.lastTeamIdAway;
-       homeName = apiProvider.lastTeamNameHome;
-       awayName = apiProvider.lastTeamNameAway;
-       homeScore = apiProvider.lastScoreHome;
-       awayScore = apiProvider.lastScoreAway;
-        break;
-
-      case 1: // next match
-       day = apiProvider.nextMatchDay;
-       hour = apiProvider.nextMatchHour;
-       homeTeam = apiProvider.nextTeamIdHome;
-       awayTeam = apiProvider.nextTeamIdAway;
-       homeName = apiProvider.nextTeamNameHome;
-       awayName = apiProvider.nextTeamNameAway;
-       homeScore = 0;
-       awayScore = 0;
-        break;
-
-      case 2: // selected match
-        id = apiProvider.idMatch;
-        day = apiProvider.nextMatchDay;
-        hour = apiProvider.nextMatchHour;
-        homeTeam = apiProvider.idHomeMatch;
-        awayTeam = apiProvider.idAwayMatch;
-        homeName = apiProvider.nameHomeMatch;
-        awayName = apiProvider.nameAwayMatch;
-        homeScore = 0;
-        awayScore = 0;
-        break;
-    }
+    int matchId = teamProvider.idMatch;
+    String day = teamProvider.matchDate;
+    int homeTeam = teamProvider.idHomeMatch;
+    int awayTeam = teamProvider.idAwayMatch;
+    String homeName = teamProvider.nameHomeMatch;
+    String awayName = teamProvider.nameAwayMatch;
+    int homeScore = teamProvider.homeScore;
+    int awayScore = teamProvider.awayScore;
+    // late final Future statisticsFuture = apiProvider.getMatchStatistics(matchId);
 
     return Scaffold(
       body: SafeArea(
@@ -79,7 +46,7 @@ class MatchScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('LaLiga 2 el $day a las $hour', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                      Text('LaLiga 2 el $day', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                       const SizedBox(height: 10,),
                       _HomeTeam(homeTeam: homeTeam, homeName: homeName, homeScore: homeScore),
                       const SizedBox(height: 10,),
@@ -91,27 +58,45 @@ class MatchScreen extends StatelessWidget {
                 // Events
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
+                  height: 100,
                   width: width,
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 80,
-                        width: 55,
-                        decoration: buildBoxDecoration(),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        height: 80,
-                        width: 55,
-                        decoration: buildBoxDecoration(),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        height: 80,
-                        width: 55,
-                        decoration: buildBoxDecoration(),
-                      ),
-                    ],
+                  child: FutureBuilder(
+                    future: apiProvider.getMatchEvents(matchId),
+                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                      if( matchId <= apiProvider.lastMatchId){ //Only show goals if the match has been played
+                        if(snapshot.hasData){
+                          var goals = snapshot.data;
+                          return ListView.builder(
+                              itemCount: goals.length,
+                              itemBuilder: (context, i) {
+                                return Container(
+                                  margin: const EdgeInsets.only(left: 20, bottom: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const FaIcon(FontAwesomeIcons.futbol, color: Colors.white),
+                                      const SizedBox(width: 10),
+                                      Text(goals[i], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                );
+                              }
+                          );
+                        }
+                        else if(snapshot.hasError){
+                          return const Center(child: Text('Ha habido un error'));
+                        }
+                        else {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                      }
+                      else {
+                        return Container(
+                          margin: const EdgeInsets.only(left: 20, bottom: 10),
+                          child: const Center(child: Text('Por jugar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                        );
+                      }
+                    }
                   ),
                 ),
 
@@ -119,42 +104,58 @@ class MatchScreen extends StatelessWidget {
 
                 // Statistics
                 FutureBuilder(
-                  future: apiProvider.getMatchStatistics(),
+                  future: apiProvider.getMatchStatistics(matchId),
                   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    return Expanded(
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    print('matchId' + matchId.toString() );
+                    print('apiProvider.lastMatchId' + apiProvider.lastMatchId.toString() );
+                    if( matchId <= apiProvider.lastMatchId){ //Only show statistics if the match has been played
+                      if(snapshot.hasData){
+                        var statistics = snapshot.data;
+                        return Expanded(
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            child: Column(
                               children: [
-                                MatchStatisticsContainer(title: 'Tiros', valueHome: apiProvider.homeShots.toString(), valueAway: apiProvider.awayShots.toString()),
-                                MatchStatisticsContainer(title: 'Tiros a puerta', valueHome: apiProvider.homeShotsOnGoal.toString(), valueAway: apiProvider.awayShotsOnGoal.toString())
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    MatchStatisticsContainer(title: 'Tiros', valueHome: statistics[0].toString(), valueAway: statistics[6].toString()),
+                                    MatchStatisticsContainer(title: 'Tiros a puerta', valueHome: statistics[1].toString(), valueAway: statistics[7].toString())
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    MatchStatisticsContainer(title: 'Posesión', valueHome: statistics[2].toString(), valueAway: statistics[8].toString()),
+                                    MatchStatisticsContainer(title: 'Pases', valueHome: statistics[3].toString(), valueAway: statistics[9].toString())
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    MatchStatisticsContainer(title: 'Tarjetas amarillas', valueHome: statistics[4].toString(), valueAway: statistics[10].toString()),
+                                    MatchStatisticsContainer(title: 'Tarjetas rojas', valueHome: statistics[5].toString(), valueAway: statistics[11].toString())
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                MatchStatisticsContainer(title: 'Posesión', valueHome: apiProvider.homeBallPosesession, valueAway: apiProvider.awayBallPosesession,),
-                                MatchStatisticsContainer(title: 'Pases', valueHome: apiProvider.homeTotalPasses.toString(), valueAway: apiProvider.awayTotalPasses.toString(),)
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                MatchStatisticsContainer(title: 'Tarjetas amarillas', valueHome: apiProvider.homeYellowCards.toString(), valueAway: apiProvider.awayYellowCards.toString()),
-                                MatchStatisticsContainer(title: 'Tarjetas rojas', valueHome: apiProvider.homeRedCards.toString(), valueAway: apiProvider.awayRedCards.toString())
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                    );
+                          ),
+                        );
+                      }
+                      else if(snapshot.hasError){
+                        return const Center(child: Text('Ha habido un error'));
+                      }
+                      else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    }
+                    else return const SizedBox();
+
+
                   },
                 )
               ],

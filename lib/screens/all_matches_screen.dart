@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:racing/screens/screens.dart';
 
 import '../providers/api_provider.dart';
+import '../providers/providers.dart';
 import '../widgets/widgets.dart';
 
 class AllMatchesScreen extends StatelessWidget {
@@ -11,9 +12,9 @@ class AllMatchesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final apiProvider = Provider.of<ApiProvider>(context);
+    final apiProvider = Provider.of<ApiProvider>(context, listen: false);
+    final teamProvider = Provider.of<TeamProvider>(context);
 
-    // TODO METER TODO EN UN FUTURE BUILDER
     return Scaffold(
         body: SafeArea(
           child: CustomScrollView(
@@ -36,57 +37,70 @@ class AllMatchesScreen extends StatelessWidget {
                 FutureBuilder(
                   future: apiProvider.getAllMatches(),
                   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: apiProvider.totMatches,
-                          (context, i) => Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
-                              child: Container(
-                              padding: const EdgeInsets.all(10),
-                              margin: const EdgeInsets.symmetric(vertical: 5),
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(25)),
-                                color: Colors.green,
-                              ),
-                                child: ListTile(
-                                  leading: SizedBox(width: 60, child: Text('Jornada ${i+1}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
-                                  trailing: SizedBox(width: 60, child: Text(apiProvider.matchDay[i], textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                    TeamsShield(
-                                      teamId: apiProvider.teamIdHome[i].toString(),
-                                      width: 40,
-                                      height: 40
-                                    ),
-                                    Text('${apiProvider.teamScoreHome[i].toString()} - ${apiProvider.teamScoreAway[i].toString()}', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                    TeamsShield(
-                                      teamId: apiProvider.teamIdAway[i].toString(),
-                                      width: 40,
-                                      height: 40
-                                      ),
-                                    ],
+                    if(snapshot.hasData){
+                      var matches = snapshot.data;
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: apiProvider.totMatches,
+                              (context, i) => Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 15),
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  margin: const EdgeInsets.symmetric(vertical: 5),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                                    color: Colors.green,
                                   ),
-                                  onTap: () {
-                                    apiProvider.idMatch = apiProvider.teamIdMatch[i];
-                                    apiProvider.idMatch = apiProvider.teamIdMatch[i];
-                                    apiProvider.idMatch = apiProvider.teamIdMatch[i];
-                                    apiProvider.idMatch = apiProvider.teamIdMatch[i];
-                                    apiProvider.idMatch = apiProvider.teamIdMatch[i];
-                                    PersistentNavBarNavigator.pushNewScreen(
-                                    context,
-                                    screen: const MatchScreen(),
-                                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                                    );
-                                },
+                                  child: ListTile(
+                                      leading: SizedBox(width: 60, child: Text('Jornada ${i+1}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
+                                    trailing: SizedBox(width: 60, child: Text(matches[7][i], textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        TeamsShield(
+                                            teamId: matches[1][i].toString(),
+                                            width: 40,
+                                            height: 40
+                                        ),
+                                        Text('${matches[5][i].toString()} - ${matches[6][i].toString()}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                        TeamsShield(
+                                            teamId: matches[2][i].toString(),
+                                            width: 40,
+                                            height: 40
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      teamProvider.idMatch = matches[0][i];
+                                      teamProvider.matchDate = matches[7][i];
+                                      teamProvider.idHomeMatch = matches[1][i];
+                                      teamProvider.idAwayMatch = matches[2][i];
+                                      teamProvider.nameHomeMatch = matches[3][i];
+                                      teamProvider.nameAwayMatch = matches[4][i];
+                                      teamProvider.homeScore = matches[5][i];
+                                      teamProvider.awayScore = matches[6][i];
+                                      PersistentNavBarNavigator.pushNewScreen(
+                                        context,
+                                        screen: const MatchScreen(),
+                                        pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                      );
+                                    },
 
                                 ),
-                              ),
-                            )
+                            ),
+                          )
+                        ),
+                      );
+                    }
+                    else if(snapshot.hasError){
+                      return const SliverToBoxAdapter(child: Center(child: Text('Ha habido un error')));
+                      // return const Center(child: Text('Ha habido un error'));
+                    }
+                    else {
+                      return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+                      // return const Center(child: CircularProgressIndicator());
+                    }
 
-
-                          ),
-                    );
                   },
                 )
               ]

@@ -12,6 +12,7 @@ class TeamPlayersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final apiProvider = Provider.of<ApiProvider>(context);
+    final teamProvider = Provider.of<TeamProvider>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -48,7 +49,7 @@ class TeamPlayersScreen extends StatelessWidget {
                         title: Text(apiProvider.playersName[i], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white,),
                         onTap: () {
-                          apiProvider.idPlayer = apiProvider.playersId[i];
+                          teamProvider.idPlayer = apiProvider.playersId[i];
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
                             screen: const PlayerScreen(),

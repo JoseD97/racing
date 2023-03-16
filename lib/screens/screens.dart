@@ -6,3 +6,4 @@ export 'package:racing/screens/team_players_screen.dart';
 export 'package:racing/screens/player_screen.dart';
 export 'package:racing/screens/table_screen.dart';
 export 'package:racing/screens/matches_screen.dart';
+

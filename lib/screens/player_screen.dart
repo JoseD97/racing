@@ -10,7 +10,8 @@ class PlayerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final apiProvider = Provider.of<ApiProvider>(context);
+    final apiProvider = Provider.of<ApiProvider>(context, listen: false);
+    final teamProvider = Provider.of<TeamProvider>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -18,9 +19,10 @@ class PlayerScreen extends StatelessWidget {
           children: [
             const BackgroundContainer(height: 250),
             FutureBuilder(
-              future: apiProvider.getPlayerStatistics(apiProvider.idPlayer),
+              future: apiProvider.getPlayerStatistics(teamProvider.idPlayer),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if(snapshot.hasData){
+                  var statistics = snapshot.data;
                   return Center(
                     child: Column(
                       children: [
@@ -34,16 +36,16 @@ class PlayerScreen extends StatelessWidget {
                             child: FadeInImage(
                               fit: BoxFit.cover,
                               placeholder: const AssetImage('assets/teams_shield.jpg'),
-                              image: NetworkImage(apiProvider.playerPhoto),
+                              image: NetworkImage(statistics[2]),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        Text(apiProvider.playerName, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20)),
+                        Text(statistics[0], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20)),
                         const SizedBox(height: 10),
-                        Text(apiProvider.playerPosition, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15)),
-                        const SizedBox(height: 30),
+                        Text(statistics[1], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15)),
+                        const SizedBox(height: 50),
 
                         // Statistics
                         Expanded(
@@ -55,24 +57,24 @@ class PlayerScreen extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    PlayerStatisticsContainer(title: 'Partidos Jugados', value: apiProvider.playerGames.toString()),
-                                    PlayerStatisticsContainer(title: 'Rating', value: apiProvider.playerRating)
+                                    PlayerStatisticsContainer(title: 'Partidos Jugados', value: statistics[4].toString()),
+                                    PlayerStatisticsContainer(title: 'Rating', value: statistics[3])
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    PlayerStatisticsContainer(title: 'Tarjetas Amarillas', value: apiProvider.playerYellowCards.toString()),
-                                    PlayerStatisticsContainer(title: 'Tarjetas Rojas', value: apiProvider.playerRedCards.toString())
+                                    PlayerStatisticsContainer(title: 'Tarjetas Amarillas', value: statistics[5].toString()),
+                                    PlayerStatisticsContainer(title: 'Tarjetas Rojas', value: statistics[6].toString())
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    PlayerStatisticsContainer(title: 'Pases', value: apiProvider.playerPasses.toString()),
-                                    PlayerStatisticsContainer(title: 'Goles', value: apiProvider.playerGoals.toString())
+                                    PlayerStatisticsContainer(title: 'Pases', value: statistics[7].toString()),
+                                    PlayerStatisticsContainer(title: 'Goles', value: statistics[8].toString())
                                   ],
                                 ),
                                 const SizedBox(height: 10),

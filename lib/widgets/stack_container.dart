@@ -4,6 +4,7 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/api_provider.dart';
+import '../providers/team_provider.dart';
 import '../screens/screens.dart';
 import 'widgets.dart';
 
@@ -29,11 +30,36 @@ class StackContainer extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final apiProvider = Provider.of<ApiProvider>(context);
+    final teamProvider = Provider.of<TeamProvider>(context);
 
     return GestureDetector(
         onTap: () {
-          apiProvider.idMatch = matchId;
-          apiProvider.matchType = matchType;
+          // apiProvider.idMatch = matchId;
+          // apiProvider.matchType = matchType;
+          switch(matchType){
+            case 0: // last match
+              teamProvider.idMatch = matchId;
+              teamProvider.matchDate= apiProvider.lastMatchDay;
+              teamProvider.idHomeMatch = apiProvider.lastTeamIdHome;
+              teamProvider.idAwayMatch = apiProvider.lastTeamIdAway;
+              teamProvider.nameHomeMatch = apiProvider.lastTeamNameHome;
+              teamProvider.nameAwayMatch = apiProvider.lastTeamNameAway;
+              teamProvider.homeScore = apiProvider.lastScoreHome;
+              teamProvider.awayScore = apiProvider.lastScoreAway;
+              break;
+
+            case 1: // next match
+              teamProvider.idMatch = matchId;
+              teamProvider.matchDate= apiProvider.nextMatchDay;
+              teamProvider.idHomeMatch = apiProvider.nextTeamIdHome;
+              teamProvider.idAwayMatch = apiProvider.nextTeamIdAway;
+              teamProvider.nameHomeMatch = apiProvider.nextTeamNameHome;
+              teamProvider.nameAwayMatch = apiProvider.nextTeamNameAway;
+              teamProvider.homeScore = 0;
+              teamProvider.awayScore = 0;
+              break;
+          }
+
           PersistentNavBarNavigator.pushNewScreen(
             context,
             screen: navScreen,
