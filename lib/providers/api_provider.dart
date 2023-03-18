@@ -16,7 +16,7 @@ class ApiProvider extends ChangeNotifier {
     getTeamPlayers();
   }
 
-  final _apiKey = 'bf881c6a187196902abf5e35189a569c';
+  final _apiKey = ''; // TODO Write your key
   final _apiHost = 'v3.football.api-sports.io';
 
   /// Matches
