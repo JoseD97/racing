@@ -96,7 +96,7 @@ class ApiProvider extends ChangeNotifier {
   }
 
 
-  // All matches    // TODO Convertir snapshot
+  // All matches
   int totMatches = 0;
   var teamIdMatch = [];
   var teamIdHome = [];

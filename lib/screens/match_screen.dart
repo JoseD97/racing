@@ -24,7 +24,6 @@ class MatchScreen extends StatelessWidget {
     String awayName = teamProvider.nameAwayMatch;
     int homeScore = teamProvider.homeScore;
     int awayScore = teamProvider.awayScore;
-    // late final Future statisticsFuture = apiProvider.getMatchStatistics(matchId);
 
     return Scaffold(
       body: SafeArea(
@@ -106,8 +105,6 @@ class MatchScreen extends StatelessWidget {
                 FutureBuilder(
                   future: apiProvider.getMatchStatistics(matchId),
                   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    print('matchId' + matchId.toString() );
-                    print('apiProvider.lastMatchId' + apiProvider.lastMatchId.toString() );
                     if( matchId <= apiProvider.lastMatchId){ //Only show statistics if the match has been played
                       if(snapshot.hasData){
                         var statistics = snapshot.data;

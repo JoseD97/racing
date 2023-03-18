@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../providers/api_provider.dart';
 import '../providers/team_provider.dart';
-import '../screens/screens.dart';
-import 'widgets.dart';
 
 class StackContainer extends StatelessWidget {
 
@@ -34,8 +32,6 @@ class StackContainer extends StatelessWidget {
 
     return GestureDetector(
         onTap: () {
-          // apiProvider.idMatch = matchId;
-          // apiProvider.matchType = matchType;
           switch(matchType){
             case 0: // last match
               teamProvider.idMatch = matchId;

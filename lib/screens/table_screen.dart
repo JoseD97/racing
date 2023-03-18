@@ -14,7 +14,6 @@ class TableScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      // bottomNavigationBar: CustomBottomNavigationBar(),
       body: SafeArea(
         child: Column(
           children: [
