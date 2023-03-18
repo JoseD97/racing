@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Racing App',
         theme: ThemeData.light().copyWith(
           primaryColorDark: Colors.green,
         ),
