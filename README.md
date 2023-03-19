@@ -1,16 +1,10 @@
-# racing
+# RacingApp
+App desarrollada con Flutter que consume datos de la API "API-FOOTBALL" y utiliza slivers para mejorar la interfaz de usuario.
+Otros paquetes utilizados: provider, http y persistent bottom nav bar.
+Con esta app puedes ver de forma rápida el último y el siguiente partido de tu equipo. También, puedes ver todos los partidos con sus estadísticas y sus goles, la clasificación y los jugadores que componen tu equipo favorito. Todo ello actualizado partido a partido.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Menu](https://github.com/JoseD97/racing/blob/master/home.png)
+![Partidos](https://github.com/JoseD97/racing/blob/master/partidos.png)
+![Partido](https://github.com/JoseD97/racing/blob/master/partido.png)
+![Clasificacion](https://github.com/JoseD97/racing/blob/master/clasificacion.png)
+![Jugadores](https://github.com/JoseD97/racing/blob/master/jugadores.png)
